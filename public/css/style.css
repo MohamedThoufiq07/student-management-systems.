@@ -1,0 +1,344 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #6366f1;
+  /* Indigo */
+  --primary-hover: #4f46e5;
+  --success: #10b981;
+  /* Emerald */
+  --success-hover: #059669;
+  --danger: #f43f5e;
+  /* Rose */
+  --danger-hover: #e11d48;
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --glass: rgba(255, 255, 255, 0.95);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --radius: 16px;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #1e293b;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+/* Base Container Settings */
+.container {
+  background: var(--glass);
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 100%;
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+/* Individual Page Sizes */
+.auth-page {
+  max-width: 450px;
+}
+
+.dashboard-page {
+  max-width: 1100px;
+  align-self: flex-start;
+  margin-top: 5vh;
+}
+
+h1,
+h2,
+h3 {
+  color: #0f172a;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  letter-spacing: -0.025em;
+}
+
+/* Navbar Styling */
+.navbar {
+  display: flex;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 1px solid #e2e8f0;
+}
+
+.navbar button {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.navbar button:hover,
+.navbar button.active {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+  background-color: var(--danger) !important;
+  color: white !important;
+  margin-left: auto;
+}
+
+.logout-btn:hover {
+  background-color: var(--danger-hover) !important;
+  transform: translateY(-1px);
+}
+
+/* Enhanced Cards */
+.card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.card h3 {
+  font-size: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f1f5f9;
+  margin-bottom: 1.25rem;
+}
+
+/* Forms & Inputs */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.5rem;
+}
+
+input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+button {
+  width: auto;
+  padding: 12px 24px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+/* Modern Tables */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+}
+
+table th {
+  background-color: #f8fafc;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9rem;
+}
+
+table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Status Indicators */
+.percentage-good {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.percentage-bad {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.action-buttons button {
+  padding: 8px 14px;
+  font-size: 0.8rem;
+}
+
+.edit-btn {
+  background-color: var(--success);
+}
+
+.edit-btn:hover {
+  background-color: var(--success-hover);
+}
+
+.delete-btn {
+  background-color: var(--danger);
+}
+
+.delete-btn:hover {
+  background-color: var(--danger-hover);
+}
+
+/* Utility */
+.error-message {
+  color: var(--danger);
+  background: rgba(244, 63, 94, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* --- Mobile Responsiveness --- */
+
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 1.5rem;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
+    /* Allows logout to drop down if needed */
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .navbar button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    flex: 1 1 auto;
+    /* Grow and shrink as needed */
+    text-align: center;
+  }
+
+  .logout-btn {
+    margin-left: 0;
+    width: 100%;
+    /* Logout takes full width on mobile for better accessibility */
+    margin-top: 5px;
+  }
+
+  /* Make tables scrollable horizontally */
+  .card {
+    padding: 1.25rem;
+    overflow-x: auto;
+  }
+
+  table td,
+  table th {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    /* Prevents text wrapping that breaks rows */
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    /* Stack Edit/Delete buttons on mobile */
+    gap: 5px;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
+
+  /* Modals on Mobile */
+  div[id$="-modal"]>div {
+    width: 95% !important;
+    padding: 15px !important;
+  }
+
+  .form-group input {
+    font-size: 16px;
+    /* Prevents iOS auto-zoom on focus */
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .navbar button {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+}
