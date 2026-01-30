@@ -3,16 +3,16 @@ const Mark = require('../models/Mark');
 const Attendance = require('../models/Attendance');
 
 exports.addStudent = async (req, res) => {
-    const { name, email, phone, registrationNumber } = req.body;
+    const { firstName, lastName, email, phone, registrationNumber, dob, gender, address } = req.body;
     console.log('Adding student for user:', req.user);
     try {
         const newStudent = await Student.create({
-            name, email, phone, registrationNumber,
+            firstName, lastName, email, phone, registrationNumber, dob, gender, address,
             createdById: req.user.id
         });
         // Create empty marks record
         await Mark.create({ studentId: newStudent.id });
-        console.log('Student added:', newStudent.name);
+        console.log('Student added:', newStudent.firstName);
         res.json(newStudent);
     } catch (err) {
         console.error('Add Student Error:', err);
@@ -37,16 +37,19 @@ exports.getStudents = async (req, res) => {
 };
 
 exports.updateStudent = async (req, res) => {
-    const { name, email, phone, registrationNumber } = req.body;
+    const { firstName, lastName, email, phone, registrationNumber, dob, gender, address } = req.body;
     const { id } = req.params;
     try {
         let student = await Student.findOne({ where: { id, createdById: req.user.id } });
         if (!student) return res.status(404).json({ msg: 'Student not found' });
-        student = await student.update({ name, email, phone, registrationNumber });
+        student = await student.update({ firstName, lastName, email, phone, registrationNumber, dob, gender, address });
         res.json(student);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error('Update Student Error:', err);
+        if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({ msg: err.errors[0].message });
+        }
+        res.status(500).json({ msg: 'Internal Server Error' });
     }
 };
 

@@ -3,7 +3,11 @@ const { sequelize } = require('../config/db');
 const User = require('./User');
 
 const Student = sequelize.define('Student', {
-    name: {
+    firstName: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    lastName: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -17,12 +21,25 @@ const Student = sequelize.define('Student', {
     },
     phone: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: true,
+        unique: true
     },
     registrationNumber: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
+    },
+    dob: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+    },
+    gender: {
+        type: DataTypes.ENUM('Male', 'Female', 'Other'),
+        allowNull: true
+    },
+    address: {
+        type: DataTypes.TEXT,
+        allowNull: true
     },
     createdById: {
         type: DataTypes.INTEGER,
@@ -32,6 +49,13 @@ const Student = sequelize.define('Student', {
             key: 'id'
         }
     }
+}, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['firstName', 'lastName']
+        }
+    ]
 });
 
 // Define Relationships

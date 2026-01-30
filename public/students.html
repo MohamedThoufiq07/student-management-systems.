@@ -6,6 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Student Management System</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .address-cell {
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .address-cell:hover {
+            white-space: normal;
+            background: #f8fafc;
+            padding: 5px;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            max-width: 300px;
+        }
+    </style>
 </head>
 
 <body onload="loadStudentsPage()">
@@ -29,46 +57,84 @@
                     <button onclick="openAddModal()" style="padding: 8px 16px;">+ Add New Student</button>
                 </div>
 
-                <table id="students-table" border="1" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Reg. Number</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="students-list">
-                        <!-- Students will be loaded here -->
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table id="students-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Reg. No</th>
+                                <th style="width: 180px;">Full Name</th>
+                                <th style="width: 200px;">Email</th>
+                                <th style="width: 130px;">Phone</th>
+                                <th style="width: 120px;">DOB</th>
+                                <th style="width: 90px;">Gender</th>
+                                <th style="width: 200px;">Address</th>
+                                <th style="width: 160px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-list">
+                            <!-- Students will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- Add Student Modal -->
         <div id="add-modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: flex-start; z-index: 1000; overflow-y: auto; padding: 20px 0;">
             <div
-                style="background: white; padding: 25px; border-radius: 10px; width: 450px; box-shadow: 0 5px 30px rgba(0,0,0,0.3);">
+                style="background: white; padding: 25px; border-radius: 10px; width: 450px; max-width: 95%; box-shadow: 0 5px 30px rgba(0,0,0,0.3); margin: auto;">
                 <h3 style="margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Add
                     New Student</h3>
+                <div id="add-error" class="error-message"
+                    style="display: none; margin-bottom: 15px; text-align: center;"></div>
                 <form id="add-student-form" onsubmit="handleAddStudent(event)">
                     <div class="form-group">
-                        <label for="s-name">Student Name:</label>
-                        <input type="text" id="s-name" placeholder="Enter Full Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="s-email">Email Address:</label>
-                        <input type="email" id="s-email" placeholder="Enter Email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="s-phone">Phone Number:</label>
-                        <input type="text" id="s-phone" placeholder="Enter Phone">
-                    </div>
-                    <div class="form-group">
                         <label for="s-reg">Registration Number:</label>
-                        <input type="text" id="s-reg" placeholder="Enter Reg Number" required>
+                        <input type="text" id="s-reg" placeholder="Enter Reg Number" required pattern="\d+"
+                            inputmode="numeric">
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="s-firstName">First Name:</label>
+                            <input type="text" id="s-firstName" placeholder="First Name" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="s-lastName">Last Name:</label>
+                            <input type="text" id="s-lastName" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="s-email">Email Address:</label>
+                            <input type="email" id="s-email" placeholder="Enter Email" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="s-phone">Phone Number:</label>
+                            <input type="tel" id="s-phone" placeholder="Enter Phone" pattern="[0-9]{10}"
+                                inputmode="numeric">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="s-dob">Date of Birth:</label>
+                            <input type="date" id="s-dob" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="s-gender">Gender:</label>
+                            <select id="s-gender" required
+                                style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px;">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="s-address">Address:</label>
+                        <textarea id="s-address" placeholder="Enter Address"
+                            style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; min-height: 80px;"></textarea>
                     </div>
                     <div
                         style="text-align: right; margin-top: 20px; gap: 10px; display: flex; justify-content: flex-end;">
@@ -120,6 +186,7 @@
                             <th>Social</th>
                             <th>Total</th>
                             <th>Percent %</th>
+                            <th>Result</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -132,24 +199,70 @@
 
         <!-- Edit Student Modal -->
         <div id="edit-modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
-            <div style="background: white; padding: 20px; border-radius: 5px; width: 400px;">
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: flex-start; z-index: 1000; overflow-y: auto; padding: 20px 0;">
+            <div
+                style="background: white; padding: 20px; border-radius: 10px; width: 450px; max-width: 95%; box-shadow: 0 5px 30px rgba(0,0,0,0.3); margin: auto;">
                 <h3>Edit Student</h3>
+                <div id="edit-error" class="error-message"
+                    style="display: none; margin-bottom: 15px; text-align: center;"></div>
                 <form id="edit-student-form" onsubmit="handleUpdateStudent(event)">
                     <input type="hidden" id="edit-id">
-                    <input type="text" id="edit-name" placeholder="Student Name" required
-                        style="width: 100%; margin-bottom: 10px; padding: 8px;">
-                    <input type="email" id="edit-email" placeholder="Email" required
-                        style="width: 100%; margin-bottom: 10px; padding: 8px;">
-                    <input type="text" id="edit-phone" placeholder="Phone Number"
-                        style="width: 100%; margin-bottom: 10px; padding: 8px;">
-                    <input type="text" id="edit-reg" placeholder="Registration Number" required
-                        style="width: 100%; margin-bottom: 10px; padding: 8px;">
-                    <div style="text-align: right;">
+
+                    <div class="form-group">
+                        <label for="edit-reg">Registration Number:</label>
+                        <input type="text" id="edit-reg" required pattern="\d+" inputmode="numeric">
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-firstName">First Name:</label>
+                            <input type="text" id="edit-firstName" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-lastName">Last Name:</label>
+                            <input type="text" id="edit-lastName" required>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-email">Email:</label>
+                            <input type="email" id="edit-email" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-phone">Phone:</label>
+                            <input type="tel" id="edit-phone" pattern="[0-9]{10}" inputmode="numeric">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-dob">Date of Birth:</label>
+                            <input type="date" id="edit-dob" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-gender">Gender:</label>
+                            <select id="edit-gender" required
+                                style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px;">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-address">Address:</label>
+                        <textarea id="edit-address"
+                            style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; min-height: 80px;"></textarea>
+                    </div>
+
+                    <div style="text-align: right; margin-top: 15px;">
                         <button type="button" onclick="closeEditModal()"
-                            style="background: var(--danger); color: white; cursor: pointer;">Cancel</button>
+                            style="background: var(--danger); color: white; cursor: pointer; min-width: 100px;">Cancel</button>
                         <button type="submit"
-                            style="background: #28a745; color: white; cursor: pointer;">Update</button>
+                            style="background: #28a745; color: white; cursor: pointer; min-width: 100px;">Update</button>
                     </div>
                 </form>
             </div>
@@ -157,9 +270,9 @@
 
         <!-- Edit Marks Modal -->
         <div id="marks-modal"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: flex-start; z-index: 1000; overflow-y: auto; padding: 20px 0;">
             <div
-                style="background: white; padding: 25px; border-radius: 10px; width: 450px; box-shadow: 0 5px 30px rgba(0,0,0,0.3);">
+                style="background: white; padding: 25px; border-radius: 10px; width: 450px; max-width: 95%; box-shadow: 0 5px 30px rgba(0,0,0,0.3); margin: auto;">
                 <h3 style="margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                     Edit Marks</h3>
                 <form id="edit-marks-form" onsubmit="handleUpdateMarks(event)">

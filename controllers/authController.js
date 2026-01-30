@@ -9,6 +9,9 @@ exports.register = async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
+        if (!password || password.length > 8) {
+            return res.status(400).json({ msg: 'Password must be maximum 8 characters long' });
+        }
         let user = await User.findOne({ where: { email } });
         if (user) {
             return res.status(400).json({ msg: 'User already exists' });

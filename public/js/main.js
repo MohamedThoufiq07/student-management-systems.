@@ -12,6 +12,22 @@ const handleSignup = async (e) => {
     const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const errorMsg = document.getElementById('error-msg');
+
+    // Client-side validations
+    if (password.length > 8) {
+        errorMsg.innerText = 'Password must be maximum 8 characters long';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        errorMsg.innerText = 'Passwords do not match';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
     try {
         const res = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
@@ -19,9 +35,19 @@ const handleSignup = async (e) => {
             body: JSON.stringify({ username, email, password })
         });
         const data = await res.json();
-        if (res.ok) { setToken(data.token); window.location.href = 'students.html'; }
-        else { document.getElementById('error-msg').innerText = data.msg || 'Signup failed'; }
-    } catch (err) { console.error(err); }
+        if (res.ok) {
+            alert('Registration successful! Please login.');
+            window.location.href = 'login.html';
+        }
+        else {
+            errorMsg.innerText = data.msg || 'Signup failed';
+            errorMsg.style.display = 'block';
+        }
+    } catch (err) {
+        console.error(err);
+        errorMsg.innerText = 'Something went wrong. Please try again.';
+        errorMsg.style.display = 'block';
+    }
 };
 
 const handleLogin = async (e) => {
@@ -35,9 +61,21 @@ const handleLogin = async (e) => {
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        if (res.ok) { setToken(data.token); window.location.href = 'students.html'; }
-        else { document.getElementById('error-msg').innerText = data.msg || 'Login failed'; }
-    } catch (err) { console.error(err); }
+        const errorMsg = document.getElementById('error-msg');
+        if (res.ok) {
+            setToken(data.token);
+            window.location.href = 'students.html';
+        }
+        else {
+            errorMsg.innerText = data.msg || 'Login failed';
+            errorMsg.style.display = 'block';
+        }
+    } catch (err) {
+        console.error(err);
+        const errorMsg = document.getElementById('error-msg');
+        errorMsg.innerText = 'Something went wrong. Please try again.';
+        errorMsg.style.display = 'block';
+    }
 };
 
 const loadDashboard = async () => {
@@ -48,6 +86,25 @@ const loadDashboard = async () => {
         return;
     }
     await fetchStudents();
+    setDateLimits();
+}
+
+const setDateLimits = () => {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Set limits for Birthday (2008 - 2022)
+    const dobInputs = ['s-dob', 'edit-dob'];
+    dobInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.setAttribute('min', '2008-01-01');
+            input.setAttribute('max', '2022-12-31');
+        }
+    });
+
+    // Set limits for Attendance (max today)
+    const attInput = document.getElementById('attendance-date');
+    if (attInput) attInput.setAttribute('max', today);
 }
 
 // Alias for compatibility
@@ -89,10 +146,13 @@ const renderStudents = (students) => {
     students.forEach(student => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${student.name}</td>
+            <td>${student.registrationNumber}</td>
+            <td style="font-weight: 600;">${student.firstName} ${student.lastName}</td>
             <td>${student.email}</td>
             <td>${student.phone || ''}</td>
-            <td>${student.registrationNumber}</td>
+            <td>${student.dob || ''}</td>
+            <td>${student.gender || ''}</td>
+            <td><div class="address-cell" title="${student.address || ''}">${student.address || ''}</div></td>
             <td>
                 <div class="action-buttons">
                     <button onclick="openEditModal(${student.id})" class="edit-btn">Edit</button>
@@ -105,6 +165,7 @@ const renderStudents = (students) => {
 };
 
 const openAddModal = () => {
+    document.getElementById('add-error').style.display = 'none';
     document.getElementById('add-modal').style.display = 'flex';
 };
 const closeAddModal = () => {
@@ -113,22 +174,45 @@ const closeAddModal = () => {
 
 const handleAddStudent = async (e) => {
     e.preventDefault();
-    const name = document.getElementById('s-name').value;
+    const registrationNumber = document.getElementById('s-reg').value;
+    const firstName = document.getElementById('s-firstName').value;
+    const lastName = document.getElementById('s-lastName').value;
     const email = document.getElementById('s-email').value;
     const phone = document.getElementById('s-phone').value;
-    const registrationNumber = document.getElementById('s-reg').value;
+    const dob = document.getElementById('s-dob').value;
+    const gender = document.getElementById('s-gender').value;
+    const address = document.getElementById('s-address').value;
+    const errDiv = document.getElementById('add-error');
+
+    if (registrationNumber && !/^\d+$/.test(registrationNumber)) {
+        errDiv.textContent = 'Registration number must contain only numbers';
+        errDiv.style.display = 'block';
+        return;
+    }
+
+    if (phone && (phone.length !== 10 || !/^\d+$/.test(phone))) {
+        errDiv.textContent = 'Phone number must be exactly 10 digits and contains only numbers';
+        errDiv.style.display = 'block';
+        return;
+    }
+
     try {
         const res = await fetch(`${API_URL}/students`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-            body: JSON.stringify({ name, email, phone, registrationNumber })
+            body: JSON.stringify({ firstName, lastName, email, phone, registrationNumber, dob, gender, address })
         });
         if (res.ok) {
             document.getElementById('add-student-form').reset();
             closeAddModal();
             fetchStudents();
         }
-        else { const data = await res.json(); alert(data.msg || 'Error adding student'); }
+        else {
+            const data = await res.json();
+            const errDiv = document.getElementById('add-error');
+            errDiv.textContent = data.msg || 'Error adding student';
+            errDiv.style.display = 'block';
+        }
     } catch (err) { console.error(err); }
 };
 
@@ -147,29 +231,67 @@ const deleteStudent = async (id) => {
 const openEditModal = (id) => {
     const student = currentStudents.find(s => s.id === id);
     if (!student) return;
+    document.getElementById('edit-error').style.display = 'none';
+    document.getElementById('edit-error').textContent = '';
+
     document.getElementById('edit-id').value = student.id;
-    document.getElementById('edit-name').value = student.name;
+    document.getElementById('edit-reg').value = student.registrationNumber;
+    document.getElementById('edit-firstName').value = student.firstName;
+    document.getElementById('edit-lastName').value = student.lastName;
     document.getElementById('edit-email').value = student.email;
     document.getElementById('edit-phone').value = student.phone || '';
-    document.getElementById('edit-reg').value = student.registrationNumber;
+    document.getElementById('edit-dob').value = student.dob || '';
+    document.getElementById('edit-gender').value = student.gender || '';
+    document.getElementById('edit-address').value = student.address || '';
+
     document.getElementById('edit-modal').style.display = 'flex';
 };
-const closeEditModal = () => document.getElementById('edit-modal').style.display = 'none';
+const closeEditModal = () => {
+    document.getElementById('edit-modal').style.display = 'none';
+    document.getElementById('edit-error').style.display = 'none';
+    document.getElementById('edit-error').textContent = '';
+};
 
 const handleUpdateStudent = async (e) => {
     e.preventDefault();
     const id = document.getElementById('edit-id').value;
-    const name = document.getElementById('edit-name').value;
+    const registrationNumber = document.getElementById('edit-reg').value;
+    const firstName = document.getElementById('edit-firstName').value;
+    const lastName = document.getElementById('edit-lastName').value;
     const email = document.getElementById('edit-email').value;
     const phone = document.getElementById('edit-phone').value;
-    const registrationNumber = document.getElementById('edit-reg').value;
+    const dob = document.getElementById('edit-dob').value;
+    const gender = document.getElementById('edit-gender').value;
+    const address = document.getElementById('edit-address').value;
+    const errDiv = document.getElementById('edit-error');
+
+    if (registrationNumber && !/^\d+$/.test(registrationNumber)) {
+        errDiv.textContent = 'Registration number must contain only numbers';
+        errDiv.style.display = 'block';
+        return;
+    }
+
+    if (phone && (phone.length !== 10 || !/^\d+$/.test(phone))) {
+        errDiv.textContent = 'Phone number must be exactly 10 digits and contains only numbers';
+        errDiv.style.display = 'block';
+        return;
+    }
+
     try {
         const res = await fetch(`${API_URL}/students/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-            body: JSON.stringify({ name, email, phone, registrationNumber })
+            body: JSON.stringify({ firstName, lastName, email, phone, registrationNumber, dob, gender, address })
         });
-        if (res.ok) { closeEditModal(); fetchStudents(); }
+        if (res.ok) {
+            closeEditModal();
+            fetchStudents();
+        } else {
+            const data = await res.json();
+            const errDiv = document.getElementById('edit-error');
+            errDiv.textContent = data.msg || 'Error updating student';
+            errDiv.style.display = 'block';
+        }
     } catch (err) { console.error(err); }
 };
 
@@ -180,7 +302,7 @@ const renderAttendance = () => {
     currentStudents.forEach(student => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${student.name}</td>
+            <td>${student.firstName} ${student.lastName}</td>
             <td>${student.registrationNumber}</td>
             <td>
                 <select class="att-status" data-id="${student.id}">
@@ -196,6 +318,12 @@ const renderAttendance = () => {
 const saveAttendance = async () => {
     const date = document.getElementById('attendance-date').value;
     if (!date) { alert('Please select a date'); return; }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (date > today) {
+        alert('Future attendance cannot be marked.');
+        return;
+    }
 
     const selects = document.querySelectorAll('.att-status');
     const promises = Array.from(selects).map(select => {
@@ -217,16 +345,23 @@ const renderMarks = () => {
     list.innerHTML = '';
     currentStudents.forEach(student => {
         const m = student.Mark || { tamil: 0, english: 0, maths: 0, science: 0, social: 0, total: 0, percentage: 0 };
+
+        // Check if any subject is 35 or less
+        const subjects = [m.tamil, m.english, m.maths, m.science, m.social];
+        const isFail = subjects.some(mark => mark <= 35);
+        const result = isFail ? '<span style="color: red; font-weight: bold;">FAIL</span>' : '<span style="color: green; font-weight: bold;">PASS</span>';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${student.name}</td>
-            <td>${m.tamil}</td>
-            <td>${m.english}</td>
-            <td>${m.maths}</td>
-            <td>${m.science}</td>
-            <td>${m.social}</td>
+            <td>${student.firstName} ${student.lastName}</td>
+            <td style="color: ${m.tamil <= 35 ? 'red' : 'inherit'}">${m.tamil}</td>
+            <td style="color: ${m.english <= 35 ? 'red' : 'inherit'}">${m.english}</td>
+            <td style="color: ${m.maths <= 35 ? 'red' : 'inherit'}">${m.maths}</td>
+            <td style="color: ${m.science <= 35 ? 'red' : 'inherit'}">${m.science}</td>
+            <td style="color: ${m.social <= 35 ? 'red' : 'inherit'}">${m.social}</td>
             <td style="font-weight:bold;">${m.total}</td>
-            <td style="font-weight:bold; color: ${m.percentage > 40 ? 'green' : 'red'};">${m.percentage.toFixed(2)}%</td>
+            <td style="font-weight:bold; color: ${m.percentage > 35 && !isFail ? 'green' : 'red'};">${m.percentage.toFixed(2)}%</td>
+            <td>${result}</td>
             <td><button onclick="openMarksModal(${student.id})" class="edit-btn">Update Marks</button></td>
         `;
         list.appendChild(tr);
@@ -261,7 +396,11 @@ const handleUpdateMarks = async (e) => {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
             body: JSON.stringify({ studentId, tamil, english, maths, science, social })
         });
-        if (res.ok) { closeMarksModal(); fetchStudents(); showSection('marks'); }
+        if (res.ok) {
+            closeMarksModal();
+            await fetchStudents();
+            showSection('marks');
+        }
     } catch (err) { console.error(err); }
 };
 
