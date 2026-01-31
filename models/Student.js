@@ -39,7 +39,7 @@ const Student = sequelize.define('Student', {
     },
     address: {
         type: DataTypes.TEXT,
-        allowNull: true
+        allowNull: false
     },
     createdById: {
         type: DataTypes.INTEGER,
