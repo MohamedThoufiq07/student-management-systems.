@@ -51,17 +51,8 @@ const fix = async () => {
             }
         }
 
-        // Clean firstName + lastName duplicates
-        const [nameDupes] = await sequelize.query(`SELECT "firstName", "lastName", COUNT(*) FROM "Students" GROUP BY "firstName", "lastName" HAVING COUNT(*) > 1`);
-        console.log('Duplicate name combinations found:', nameDupes);
-        for (let res of nameDupes) {
-            const students = await Student.findAll({ where: { firstName: res.firstName, lastName: res.lastName }, order: [['id', 'ASC']] });
-            const toDelete = students.slice(1);
-            for (let s of toDelete) {
-                await Mark.destroy({ where: { studentId: s.id } });
-                await s.destroy();
-            }
-        }
+        // Duplicate name combinations are now allowed.
+        console.log('Skipping duplicate name cleaning as per user request.');
 
         console.log('Migration and cleaning complete.');
         process.exit(0);

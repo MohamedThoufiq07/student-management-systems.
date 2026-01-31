@@ -16,8 +16,8 @@ const handleSignup = async (e) => {
     const errorMsg = document.getElementById('error-msg');
 
     // Client-side validations
-    if (password.length > 8) {
-        errorMsg.innerText = 'Password must be maximum 8 characters long';
+    if (password.length < 8) {
+        errorMsg.innerText = 'Password must be at least 8 characters long';
         errorMsg.style.display = 'block';
         return;
     }
@@ -54,6 +54,14 @@ const handleLogin = async (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('error-msg');
+
+    if (password.length < 8) {
+        errorMsg.innerText = 'Password must be at least 8 characters long';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
     try {
         const res = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',

@@ -49,13 +49,6 @@ const Student = sequelize.define('Student', {
             key: 'id'
         }
     }
-}, {
-    indexes: [
-        {
-            unique: true,
-            fields: ['firstName', 'lastName']
-        }
-    ]
 });
 
 // Define Relationships
